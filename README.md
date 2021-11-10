@@ -1,1 +1,1 @@
-# Pre-aceleraci-n-Nicolas-Cordoba
+# Challenge de ingreso a la aceleración en backend con C# de Alkemy
