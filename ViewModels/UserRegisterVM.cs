@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace AlkemyDisney.ViewModels
 {
-    public class UserVM
+    public class UserRegisterVM
     {
         [Required]
         [MinLength(6)]
         public string userName { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
 
         [Required]
         [MinLength(6)]

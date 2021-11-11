@@ -1,4 +1,5 @@
 ﻿using AlkemyDisney.Models;
+using AlkemyDisney.Services;
 using AlkemyDisney.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -26,21 +27,24 @@ namespace AlkemyDisney.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private IConfiguration _configuration;
+        private readonly IMailService _mailService;
+
         private string WriteToken(JwtSecurityToken token) => new JwtSecurityTokenHandler().WriteToken(token);
 
         public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, 
-            RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+            RoleManager<IdentityRole> roleManager, IConfiguration configuration, IMailService mailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _mailService = mailService;
 
         }
 
         [HttpPost]
         [Route("/register")]
-        public async Task<IActionResult> Register(UserVM nuevoUsuario)
+        public async Task<IActionResult> Register(UserRegisterVM nuevoUsuario)
         {
             var usuarioExistente = await _userManager.FindByNameAsync(nuevoUsuario.userName);
 
@@ -57,6 +61,7 @@ namespace AlkemyDisney.Controllers
             var usuario = new User
             {
                 UserName = nuevoUsuario.userName,
+                Email = nuevoUsuario.Email,
                 IsActive = true
             };
 
@@ -72,10 +77,12 @@ namespace AlkemyDisney.Controllers
                     });
             }
 
+            await _mailService.SendEmail(usuario);
+
             return Ok(
                 new { 
                 Status = "Success",
-                Message = $"Se creo el usuario {usuario.UserName}"
+                Message = $"Se creo el usuario {usuario.UserName}, verifique su corre electrónico"
                 });
 
         }
@@ -83,7 +90,7 @@ namespace AlkemyDisney.Controllers
 
         [HttpPost]
         [Route("/login")]
-        public async Task<IActionResult> Login(UserVM usuario)
+        public async Task<IActionResult> Login(UserLoginVM usuario)
         {
             var resultado = await _signInManager.PasswordSignInAsync(usuario.userName, usuario.Password, false, false);
 
@@ -97,11 +104,12 @@ namespace AlkemyDisney.Controllers
                 }
 
             }
+
             return StatusCode(StatusCodes.Status401Unauthorized,
                 new
                 {
                     Status = "Error",
-                    Message = $"{usuario.userName} no tiene autorización"
+                    Message = $"El usuario {usuario.userName} o su password no son válidos, intente nuevamente"
                 });
         }
 

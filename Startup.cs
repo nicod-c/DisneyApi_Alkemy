@@ -1,6 +1,7 @@
 using AlkemyDisney.Context;
 using AlkemyDisney.Models;
 using AlkemyDisney.Repositories;
+using AlkemyDisney.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SendGrid.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,6 +83,12 @@ namespace AlkemyDisney
             services.AddScoped<IPeliculaRepository, PeliculaRepository>();
             services.AddScoped<IGeneroRepository, GeneroRepository>();
 
+            services.AddSendGrid( o =>
+                {
+                    o.ApiKey = "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";
+                });
+
+            services.AddSingleton<IMailService, MailService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
