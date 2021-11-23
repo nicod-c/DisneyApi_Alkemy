@@ -85,7 +85,7 @@ namespace AlkemyDisney
 
             services.AddSendGrid( o =>
                 {
-                    o.ApiKey = "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";
+                    o.ApiKey = "";
                 });
 
             services.AddSingleton<IMailService, MailService>();
